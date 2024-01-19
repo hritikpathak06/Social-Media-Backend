@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
 app.use(cors({
-  origin:'*',
+  origin:'http://localhost:3000',
   credentials:true
 }));
 app.use(morgan("common"));
@@ -26,7 +26,7 @@ app.use("/api/v1",postRoutes);
 
 // Demo Route
 app.get("/", (req, res) => {
-  res.send("Social Media Server Running Perfectly");
+  res.send("Social Media Server Running Perfectly || Local Host Added");
 });
 
 
