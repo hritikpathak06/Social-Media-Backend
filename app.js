@@ -26,7 +26,7 @@ app.use("/api/v1",postRoutes);
 
 // Demo Route
 app.get("/", (req, res) => {
-  res.send("Social Media Server Running Perfectly || Local Host Added");
+  res.send("Social Media Server Running Perfectly || Local Host Added LL");
 });
 
 

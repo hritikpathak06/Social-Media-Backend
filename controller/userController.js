@@ -22,7 +22,9 @@ exports.registerUser = async (req, res) => {
       },
     });
     const token = await user.generateToken();
-    res.cookie("token", token, { httpOnly: true });
+    // res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: 'None' });
+
     res.status(201).json({
       success: true,
       message: "User Created Successfully",
@@ -58,7 +60,8 @@ exports.loginUser = async (req, res) => {
     }
     const token = await user.generateToken();
     // res.cookie('token',token,{httpOnly:true});
-    res.cookie("token", token, { httpOnly: true });
+    // res.cookie("token", token, { httpOnly: true,secure:true,sameSite:'none' });
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: 'None' });
     res.status(200).json({
       success: true,
       message: "User Logged In Successfully",
