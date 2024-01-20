@@ -5,7 +5,7 @@ const Post = require("../models/postSchema");
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email }).populate("posts followers following")
     if (user) {
       return res.status(404).json({
         success: false,
@@ -44,7 +44,7 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("posts followers following")
     if (!user) {
       return res.status(200).json({
         success: true,
@@ -77,6 +77,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+// Logout User
 exports.logout = async (req, res) => {
   res.clearCookie("token");
   res.status(200).json({
@@ -84,6 +85,7 @@ exports.logout = async (req, res) => {
     message: "User Logged Out Successfully",
   });
 };
+
 
 // Follow a user || Unfollow A User
 exports.followUser = async (req, res) => {
@@ -134,7 +136,7 @@ exports.getPostOfFollowing = async (req, res) => {
       owner: {
         $in: user.following,
       },
-    }).populate("owner likes")
+    }).populate("owner likes comments.user")
     res.status(200).json({
       success: true,
       posts:posts.reverse(),
@@ -147,6 +149,7 @@ exports.getPostOfFollowing = async (req, res) => {
     });
   }
 };
+
 
 // Update Password
 exports.updatePassword = async (req, res) => {
@@ -175,16 +178,20 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
+
 // Update Profile
 exports.updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    const { name, email } = req.body;
+    const { name, email,avatar } = req.body;
     if (name) {
       user.name = name;
     }
     if (email) {
       user.email = email;
+    }
+    if(avatar){
+      user.avatar = avatar
     }
     // user avatar todo
 
@@ -232,10 +239,11 @@ exports.deleteMyProfile = async (req, res) => {
   }
 };
 
+
 // My Profile
 exports.myProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate("posts");
+    const user = await User.findById(req.user._id).populate("posts followers following");
     res.status(200).json({
       success: true,
       message: "My Profile Opened",
@@ -250,10 +258,11 @@ exports.myProfile = async (req, res) => {
   }
 };
 
+
 // Get User Profile
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).populate("posts");
+    const user = await User.findById(req.params.id).populate("posts followers following");
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -290,3 +299,54 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+
+// Get My Posts
+exports.getMyPosts = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    const posts = [];
+
+    for (let i = 0; i < user.posts.length; i++) {
+      const post = await Post.findById(user.posts[i]).populate(
+        "likes comments.user owner"
+      );
+      posts.push(post);
+    }
+    res.status(200).json({
+      success: true,
+      posts:posts.reverse(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+// Get User Posts
+exports.getUserPosts = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    const posts = [];
+
+    for (let i = 0; i < user.posts.length; i++) {
+      const post = await Post.findById(user.posts[i]).populate(
+        "likes comments.user owner"
+      );
+      posts.push(post);
+    }
+    res.status(200).json({
+      success: true,
+      posts,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
