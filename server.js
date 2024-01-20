@@ -11,9 +11,9 @@ connectDatabase();
 
 // Clodinary Config
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: "drbzzh6j7",
+  api_key: "776943229854165",
+  api_secret: "RWZatGE-U7hTRE0Re8XM8JnVv84",
 });
 
 

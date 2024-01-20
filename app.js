@@ -17,7 +17,6 @@ app.use(
 );
 app.use(morgan("common"));
 
-
 // Routes Path
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
@@ -26,10 +25,11 @@ const postRoutes = require("./routes/postRoutes");
 app.use("/api/v1", userRoutes);
 app.use("/api/v1", postRoutes);
 
-
 // Demo Route
 app.get("/", (req, res) => {
-  res.send("Social Media Server Running Perfectly || Local Host Added LL || Cloduinary Added");
+  res.send(
+    "Social Media Server Running Perfectly || Local Host Added LL || Cloduinary Added"
+  );
 });
 
 module.exports = app;
