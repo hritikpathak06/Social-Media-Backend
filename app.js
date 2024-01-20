@@ -11,7 +11,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    // origin: "http://localhost:3000",
+    origin:"https://socio-media-delta.vercel.app",
     credentials: true,
   })
 );
@@ -28,7 +29,7 @@ app.use("/api/v1", postRoutes);
 // Demo Route
 app.get("/", (req, res) => {
   res.send(
-    "Social Media Server Running Perfectly || Local Host Added LL || Cloduinary Added"
+    "Social Media Server Running Perfectly || Local Host Added LL || Cloduinary Added || Product Cors Added"
   );
 });
 
