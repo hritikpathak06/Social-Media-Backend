@@ -15,7 +15,8 @@ app.use(cookieParser());
 app.use(
   cors({
     // origin: "http://localhost:3000",
-    origin:"https://socio-media-delta.vercel.app",
+    // origin:"https://socio-media-delta.vercel.app",
+    origin:"https://socio-media-delta.vercel.app/",
     credentials: true,
   })
 );
