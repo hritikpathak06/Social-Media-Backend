@@ -45,7 +45,7 @@ router.route("/delete/profile").delete(isAuthenticated, deleteMyProfile);
 router.route("/me").get(isAuthenticated, myProfile);
 
 // Get User Profile
-router.route("user/:id").get(isAuthenticated,getUserProfile);
+router.route("/user/:id").get(isAuthenticated,getUserProfile);
 
 // Get All Users
 router.route("/all/users").get(isAuthenticated,getAllUsers);

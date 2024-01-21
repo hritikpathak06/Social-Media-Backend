@@ -125,8 +125,8 @@ exports.followUser = async (req, res) => {
       userToFollow.followers.splice(indexFollowers, 1);
       await loggedInUser.save();
       await userToFollow.save();
-      return res.status(400).json({
-        success: false,
+      return res.status(200).json({
+        success: true,
         message: "User Unfollowed",
       });
     } else {
@@ -209,9 +209,14 @@ exports.updateProfile = async (req, res) => {
       user.email = email;
     }
     if (avatar) {
-      user.avatar = avatar;
+      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+
+      const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+        folder: "avatars",
+      });
+      user.avatar.public_id = myCloud.public_id;
+      user.avatar.url = myCloud.secure_url;
     }
-    // user avatar todo
 
     await user.save();
     res.status(200).json({
