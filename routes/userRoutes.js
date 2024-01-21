@@ -24,7 +24,7 @@ router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 
 // Logout User
-router.route("/logout").post(logout);
+router.route("/logout").get(logout);
 
 // Follow & Unfollow User
 router.route("/follow/:id").get(isAuthenticated, followUser);

@@ -1,29 +1,39 @@
 const User = require("../models/userSchema");
 const Post = require("../models/postSchema");
+const cloudinary = require("cloudinary");
 
 // Register User
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    let user = await User.findOne({ email }).populate("posts followers following")
+    const { name, email, password, avatar } = req.body;
+    let user = await User.findOne({ email }).populate(
+      "posts followers following"
+    );
     if (user) {
       return res.status(404).json({
         success: false,
         message: "User Already Exists",
       });
     }
+    const myData = await cloudinary.v2.uploader.upload(avatar, {
+      folder: "avatars",
+    });
     user = await User.create({
       name,
       email,
       password,
       avatar: {
-        public_id: "sample public id",
-        url: "sample url",
+        public_id: myData.public_id,
+        url: myData.secure_url,
       },
     });
     const token = await user.generateToken();
     // res.cookie("token", token, { httpOnly: true });
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: 'None' });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
 
     res.status(201).json({
       success: true,
@@ -44,7 +54,9 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).populate("posts followers following")
+    const user = await User.findOne({ email }).populate(
+      "posts followers following"
+    );
     if (!user) {
       return res.status(200).json({
         success: true,
@@ -59,9 +71,11 @@ exports.loginUser = async (req, res) => {
       });
     }
     const token = await user.generateToken();
-    // res.cookie('token',token,{httpOnly:true});
-    // res.cookie("token", token, { httpOnly: true,secure:true,sameSite:'none' });
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: 'None' });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
     res.status(200).json({
       success: true,
       message: "User Logged In Successfully",
@@ -79,13 +93,19 @@ exports.loginUser = async (req, res) => {
 
 // Logout User
 exports.logout = async (req, res) => {
-  res.clearCookie("token");
-  res.status(200).json({
-    success: true,
-    message: "User Logged Out Successfully",
-  });
+  res
+    .status(200)
+    .cookie("token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    })
+    .json({
+      success: true,
+      message: "Logged out",
+    });
 };
-
 
 // Follow a user || Unfollow A User
 exports.followUser = async (req, res) => {
@@ -131,15 +151,15 @@ exports.followUser = async (req, res) => {
 // Show Following user Post
 exports.getPostOfFollowing = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id);
     const posts = await Post.find({
       owner: {
         $in: user.following,
       },
-    }).populate("owner likes comments.user")
+    }).populate("owner likes comments.user");
     res.status(200).json({
       success: true,
-      posts:posts.reverse(),
+      posts: posts.reverse(),
     });
   } catch (error) {
     console.log(error);
@@ -149,7 +169,6 @@ exports.getPostOfFollowing = async (req, res) => {
     });
   }
 };
-
 
 // Update Password
 exports.updatePassword = async (req, res) => {
@@ -178,20 +197,19 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-
 // Update Profile
 exports.updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    const { name, email,avatar } = req.body;
+    const { name, email, avatar } = req.body;
     if (name) {
       user.name = name;
     }
     if (email) {
       user.email = email;
     }
-    if(avatar){
-      user.avatar = avatar
+    if (avatar) {
+      user.avatar = avatar;
     }
     // user avatar todo
 
@@ -239,11 +257,12 @@ exports.deleteMyProfile = async (req, res) => {
   }
 };
 
-
 // My Profile
 exports.myProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate("posts followers following");
+    const user = await User.findById(req.user._id).populate(
+      "posts followers following"
+    );
     res.status(200).json({
       success: true,
       message: "My Profile Opened",
@@ -258,11 +277,12 @@ exports.myProfile = async (req, res) => {
   }
 };
 
-
 // Get User Profile
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).populate("posts followers following");
+    const user = await User.findById(req.params.id).populate(
+      "posts followers following"
+    );
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -315,7 +335,7 @@ exports.getMyPosts = async (req, res) => {
     }
     res.status(200).json({
       success: true,
-      posts:posts.reverse(),
+      posts: posts.reverse(),
     });
   } catch (error) {
     res.status(500).json({
@@ -324,7 +344,6 @@ exports.getMyPosts = async (req, res) => {
     });
   }
 };
-
 
 // Get User Posts
 exports.getUserPosts = async (req, res) => {
@@ -349,4 +368,4 @@ exports.getUserPosts = async (req, res) => {
       message: error.message,
     });
   }
-}
+};
